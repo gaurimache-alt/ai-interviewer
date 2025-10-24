@@ -3,8 +3,9 @@ import React, { createContext, useState } from "react";
 export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null); // { name: "John Doe" }
+  const [user, setUser] = useState(null); 
   const [credits, setCredits] = useState(15);
+  console.log("AuthContext — credits (context):", credits);
 
   const login = (name) => {
     setUser({ name });

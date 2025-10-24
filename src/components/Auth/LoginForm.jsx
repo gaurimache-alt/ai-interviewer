@@ -1,71 +1,196 @@
 // src/components/Auth/LoginForm.jsx
-import React, { useState } from "react";
-import useAuth from "../../hooks/useAuth";
-import styles from "../../styles/LoginForm.module.css";
 import { motion } from "framer-motion";
+import { Link, useNavigate } from "react-router-dom";
+import { useState, useContext } from "react";
+import { AuthContext } from "../../context/AuthContext";
+import { Eye, EyeOff } from "lucide-react"; 
 
-export default function LoginForm() {
-  const { login, signup } = useAuth();
-  const [isSignUp, setIsSignUp] = useState(false);
+function LoginForm() {
+  const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
+
+  
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = (e) => {
+  
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
+  const handleLogin = (e) => {
     e.preventDefault();
-    if (!email.trim() || !password.trim()) return alert("Fill all fields!");
-    if (isSignUp) signup(email.trim(), password.trim());
-    else login(email.trim(), password.trim());
+
+    
+    const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+
+    
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[{\]};:'",.<>/?\\|`~]).{8,}$/;
+
+    let isValid = true;
+
+    if (!gmailRegex.test(email)) {
+      setEmailError("Invalid email address (must be @gmail.com)");
+      isValid = false;
+    } else {
+      setEmailError("");
+    }
+
+    if (!passwordRegex.test(password)) {
+      setPasswordError(
+        "Password must be at least 8 characters long, include 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special symbol."
+      );
+      isValid = false;
+    } else {
+      setPasswordError("");
+    }
+
+    if (!isValid) return;
+
+    login(email);
+    console.log("LoginForm: login() called with", email);
+    navigate("/dashboard");
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gradient-to-r from-blue-300 via-purple-300 to-pink-200">
-      <motion.div
-        initial={{ opacity: 0, y: -50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7 }}
-        className="w-full max-w-md p-8 bg-white rounded-3xl shadow-xl"
-      >
-        <h1 className="text-3xl font-bold text-center mb-2 text-gradient animate-pulse">
-          Welcome to AI-Interviewer
+    <>
+      
+      <header className="w-full fixed top-0 left-0 flex justify-between items-center px-10 py-4 bg-[#1e3a8a]/70 backdrop-blur-md shadow-lg border-b border-blue-400/30 z-50">
+        <h1 className="flex items-center text-3xl font-extrabold text-white tracking-wide drop-shadow-[0_2px_3px_rgba(0,0,0,0.5)]">
+          <span className="text-white mr-2">🤖</span>
+          AI <span className="text-blue-300 ml-1">Interviewer</span>
         </h1>
-        <h2 className="text-2xl font-semibold text-center mb-6">
-          {isSignUp ? "Sign Up" : "Login"}
-        </h2>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <motion.input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className={`${styles.input} border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-purple-500 transition`}
-            whileFocus={{ scale: 1.02 }}
-          />
-          <motion.input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className={`${styles.input} border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-purple-500 transition`}
-            whileFocus={{ scale: 1.02 }}
-          />
-          <motion.button
-            type="submit"
-            className="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-3 rounded-lg shadow-md transform hover:scale-105 transition"
-            whileTap={{ scale: 0.95 }}
+
+        <nav className="flex space-x-6 text-lg font-semibold">
+          <button
+            onClick={() => (window.location.href = "/dashboard")}
+            className="text-white hover:text-blue-400 transition"
           >
-            {isSignUp ? "Sign Up" : "Login"}
-          </motion.button>
-        </form>
-        <p className="text-sm mt-4 text-center text-gray-600">
-          {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
-          <span
-            className="text-purple-600 cursor-pointer hover:underline font-medium"
-            onClick={() => setIsSignUp(!isSignUp)}
+            Home
+          </button>
+          <button
+            onClick={() => (window.location.href = "/about")}
+            className="text-white hover:text-blue-400 transition"
           >
-            {isSignUp ? "Login" : "Sign Up"}
-          </span>
-        </p>
-      </motion.div>
-    </div>
+            About Us
+          </button>
+          <button
+            onClick={() => (window.location.href = "/login")}
+            className="text-white hover:text-blue-400 transition"
+          >
+            Login
+          </button>
+          <button
+            onClick={() => (window.location.href = "/signup")}
+            className="text-white hover:text-blue-400 transition"
+          >
+            Signup
+          </button>
+          <button
+            onClick={() => window.location.reload()}
+            className="text-white hover:text-red-400 transition"
+          >
+            Logout
+          </button>
+        </nav>
+      </header>
+
+      {/* ✅ Page layout */}
+      <div className="flex justify-between items-center min-h-screen px-10 bg-gradient-to-br from-[#a7c0f2] via-[#7ea1e8] to-[#a7c0f2] pt-24">
+        {/* LEFT */}
+        <div className="flex flex-col justify-center w-1/2 pl-10">
+          <h1 className="text-6xl font-extrabold text-brown-700 mb-4 drop-shadow-sm">
+            AI Interviewer
+          </h1>
+          <p className="text-xl text-white-600 font-medium">
+            Practice Smart. Interview Confidently.
+          </p>
+        </div>
+
+        {/* RIGHT: form */}
+        <div className="flex justify-center items-center w-1/2">
+          <motion.div
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="bg-white border border-gray-200 p-8 rounded-2xl shadow-lg w-96 text-center"
+          >
+            <h1 className="text-3xl font-bold mb-6 text-gray-800">Welcome 👋</h1>
+
+            <form onSubmit={handleLogin} className="flex flex-col gap-4">
+              {/* EMAIL INPUT */}
+              <input
+                type="email"
+                placeholder="Enter your Email"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (emailError) setEmailError("");
+                }}
+                required
+                className={`p-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  emailError ? "border-red-500" : "border-gray-300"
+                }`}
+              />
+              {emailError && (
+                <p className="text-red-500 text-sm font-medium -mt-2">
+                  {emailError}
+                </p>
+              )}
+
+              
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (passwordError) setPasswordError("");
+                  }}
+                  required
+                  className={`p-3 w-full rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    passwordError ? "border-red-500" : "border-gray-300"
+                  }`}
+                />
+                
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-blue-600"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+              {passwordError && (
+                <p className="text-red-500 text-sm font-medium -mt-2">
+                  {passwordError}
+                </p>
+              )}
+
+              <button
+                type="submit"
+                className="bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold transition-all"
+              >
+                Login
+              </button>
+            </form>
+
+            <p className="mt-4 text-gray-600">
+              Don’t have an account?{" "}
+              <Link
+                to="/signup"
+                className="text-blue-600 font-semibold hover:underline"
+              >
+                Sign up
+              </Link>
+            </p>
+          </motion.div>
+        </div>
+      </div>
+    </>
   );
 }
+
+export default LoginForm;
