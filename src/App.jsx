@@ -1,8 +1,19 @@
+
 import React, { useContext, useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from "react-router-dom";
+
+
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Link,
+  useNavigate,
+  Navigate,
+} from "react-router-dom";
 import { AuthContext } from "./context/AuthContext";
 import { InterviewContext } from "./context/InterviewContext";
 import LoginForm from "./components/Auth/LoginForm";
+import SignupForm from "./components/Auth/SignupForm";
 import Dashboard from "./components/Dashboard/Dashboard";
 import AboutUs from "./components/About/AboutUs";
 import InterviewContainer from "./components/Interview/InterviewContainer";
@@ -18,20 +29,21 @@ export default function AppWrapper() {
 }
 
 function App() {
+  
   const { user, credits, deductCredits } = useContext(AuthContext);
+
+  
+  const interviewCtx = useContext(InterviewContext) || {};
   const {
-    started,
-    setStarted,
-    completed,
-    selectedCompany,
-    selectCompanyRole,
-  } = useContext(InterviewContext);
+    started = false,
+    setStarted = () => {},
+    completed = false,
+    selectedCompany = null,
+    selectCompanyRole = () => {},
+  } = interviewCtx;
 
   const [showCreditsModal, setShowCreditsModal] = useState(false);
-
   const navigate = useNavigate();
-
-  if (!user) return <LoginForm />;
 
   const handleSelectRole = (company, role) => {
     if (credits <= 0) {
@@ -54,48 +66,59 @@ function App() {
 
   return (
     <>
-      {/* Navigation Bar */}
-      <nav className="flex justify-between items-center p-4 bg-white shadow-md mb-6 rounded-b-xl">
-        <h1 className="text-2xl font-bold text-purple-600">AI-Interviewer</h1>
-        <div className="space-x-4">
-          <Link to="/dashboard" className="text-purple-600 hover:underline">
-            Dashboard
-          </Link>
-          <Link to="/about" className="text-purple-600 hover:underline">
-            About Us
-          </Link>
-          <span
-            className="text-red-500 cursor-pointer hover:underline"
-            onClick={() => window.location.reload()}
-          >
-            Logout
-          </span>
-        </div>
-      </nav>
-
+      
+      
       {/* Buy Credits Modal */}
       {showCreditsModal && <BuyCreditsModal closeModal={closeModal} />}
 
+     
       <Routes>
+        
+        <Route path="/login" element={<LoginForm />} />
+        <Route path="/signup" element={<SignupForm />} />
+        <Route path="/about" element={<AboutUs />} />
+        <Route path="/completed" element={<CompletionScreen />} />
+
+        {/* Protected Dashboard route: redirect to /login when not logged in */}
         <Route
           path="/dashboard"
-          element={<Dashboard credits={credits} onSelect={handleSelectRole} />}
-        />
-        <Route path="/about" element={<AboutUs />} />
-        <Route
-          path="/interview"
           element={
-            started && selectedCompany ? (
-              <InterviewContainer />
-            ) : (
+            user ? (
               <Dashboard credits={credits} onSelect={handleSelectRole} />
+            ) : (
+              <Navigate to="/login" replace />
             )
           }
         />
-        <Route path="/completed" element={<CompletionScreen />} />
+
+        
+        <Route
+          path="/interview"
+          element={
+            user ? (
+              started && selectedCompany ? (
+                <InterviewContainer />
+              ) : (
+                
+                <Dashboard credits={credits} onSelect={handleSelectRole} />
+              )
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+
+        {/* Root and fallback */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
         <Route
           path="*"
-          element={<Dashboard credits={credits} onSelect={handleSelectRole} />}
+          element={
+            user ? (
+              <Dashboard credits={credits} onSelect={handleSelectRole} />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
         />
       </Routes>
     </>
