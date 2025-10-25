@@ -7,13 +7,11 @@ import { Eye, EyeOff } from "lucide-react";
 export default function SignupForm() {
   const navigate = useNavigate();
 
- 
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  
   const [nameError, setNameError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
@@ -21,41 +19,30 @@ export default function SignupForm() {
   const handleSignup = (e) => {
     e.preventDefault();
 
-  
     let isValid = true;
 
     if (!fullName.trim()) {
       setNameError("Full name is required.");
       isValid = false;
-    } else {
-      setNameError("");
-    }
+    } else setNameError("");
 
-    
     const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
     if (!gmailRegex.test(email)) {
       setEmailError("Invalid email address (must be @gmail.com)");
       isValid = false;
-    } else {
-      setEmailError("");
-    }
+    } else setEmailError("");
 
-    
     const passwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[{\]};:'",.<>/?\\|`~]).{8,}$/;
-
     if (!passwordRegex.test(password)) {
       setPasswordError(
         "Password must be at least 8 characters long, include 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special symbol."
       );
       isValid = false;
-    } else {
-      setPasswordError("");
-    }
+    } else setPasswordError("");
 
     if (!isValid) return;
 
-    
     navigate("/login");
   };
 
@@ -80,24 +67,18 @@ export default function SignupForm() {
           >
             About Us
           </button>
-          <button
+          {/* <button
             onClick={() => (window.location.href = "/credits")}
             className="text-white hover:text-blue-400 transition"
           >
-            Login
-          </button>
-          <button
-            onClick={() => (window.location.href = "/signup")}
-            className="text-white hover:text-blue-400 transition"
-          >
-            Signup
-          </button>
-          <button
-            onClick={() => window.location.reload()}
+            Credit
+          </button> */}
+          {/* <button
+            onClick={() => (window.location.href = "/logout")}
             className="text-white hover:text-red-400 transition"
           >
             Logout
-          </button>
+          </button> */}
         </nav>
       </header>
 
@@ -125,6 +106,7 @@ export default function SignupForm() {
             </h1>
 
             <form onSubmit={handleSignup} className="flex flex-col gap-4">
+              {/* Full Name */}
               <input
                 type="text"
                 placeholder="Full Name"
@@ -144,6 +126,7 @@ export default function SignupForm() {
                 </p>
               )}
 
+              {/* Email */}
               <input
                 type="email"
                 placeholder="Email"
@@ -163,10 +146,10 @@ export default function SignupForm() {
                 </p>
               )}
 
-             
+              {/* Password */}
               <div className="relative">
                 <input
-                  type={showPassword ? "text" : "password"}
+                  type={showPassword ? "text" : "password"} // Correct logic: true => visible
                   placeholder="Password"
                   value={password}
                   onChange={(e) => {
@@ -180,10 +163,10 @@ export default function SignupForm() {
                 />
                 <button
                   type="button"
-                  onClick={() => setShowPassword((s) => !s)}
+                  onClick={() => setShowPassword((prev) => !prev)}
                   className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-blue-600"
                 >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
                 </button>
               </div>
               {passwordError && (
@@ -215,4 +198,3 @@ export default function SignupForm() {
     </>
   );
 }
-

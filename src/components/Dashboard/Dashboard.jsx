@@ -36,7 +36,7 @@ import { Bot } from "lucide-react";
       
       <header className="w-full fixed top-0 left-0 flex justify-between items-center px-10 py-4 bg-[#1e3a8a]/70 backdrop-blur-md shadow-lg border-b border-blue-400/30">
         <h1 className="flex items-center text-3xl font-extrabold text-white tracking-wide drop-shadow-[0_2px_3px_rgba(0,0,0,0.5)]">
-          <Bot className="w-8 h-8 text-black-300 mr-2" />
+          <span className="text-white mr-2">🤖</span>
           AI <span className="text-blue-300 ml-1">Interviewer</span>
         </h1>
 

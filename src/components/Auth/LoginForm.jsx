@@ -3,28 +3,23 @@ import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
-import { Eye, EyeOff } from "lucide-react"; 
+import { Eye, EyeOff } from "lucide-react";
 
 function LoginForm() {
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
 
-  
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
 
   const handleLogin = (e) => {
     e.preventDefault();
 
-    
     const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
-
-    
     const passwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[{\]};:'",.<>/?\\|`~]).{8,}$/;
 
@@ -55,20 +50,13 @@ function LoginForm() {
 
   return (
     <>
-      
+      {/* Header */}
       <header className="w-full fixed top-0 left-0 flex justify-between items-center px-10 py-4 bg-[#1e3a8a]/70 backdrop-blur-md shadow-lg border-b border-blue-400/30 z-50">
         <h1 className="flex items-center text-3xl font-extrabold text-white tracking-wide drop-shadow-[0_2px_3px_rgba(0,0,0,0.5)]">
           <span className="text-white mr-2">🤖</span>
           AI <span className="text-blue-300 ml-1">Interviewer</span>
         </h1>
-
         <nav className="flex space-x-6 text-lg font-semibold">
-          <button
-            onClick={() => (window.location.href = "/dashboard")}
-            className="text-white hover:text-blue-400 transition"
-          >
-            Home
-          </button>
           <button
             onClick={() => (window.location.href = "/about")}
             className="text-white hover:text-blue-400 transition"
@@ -87,18 +75,12 @@ function LoginForm() {
           >
             Signup
           </button>
-          <button
-            onClick={() => window.location.reload()}
-            className="text-white hover:text-red-400 transition"
-          >
-            Logout
-          </button>
         </nav>
       </header>
 
-      {/* ✅ Page layout */}
+      {/* Page Layout */}
       <div className="flex justify-between items-center min-h-screen px-10 bg-gradient-to-br from-[#a7c0f2] via-[#7ea1e8] to-[#a7c0f2] pt-24">
-        {/* LEFT */}
+        {/* Left Section */}
         <div className="flex flex-col justify-center w-1/2 pl-10">
           <h1 className="text-6xl font-extrabold text-brown-700 mb-4 drop-shadow-sm">
             AI Interviewer
@@ -108,7 +90,7 @@ function LoginForm() {
           </p>
         </div>
 
-        {/* RIGHT: form */}
+        {/* Right Section: Form */}
         <div className="flex justify-center items-center w-1/2">
           <motion.div
             initial={{ opacity: 0, y: -50 }}
@@ -119,7 +101,7 @@ function LoginForm() {
             <h1 className="text-3xl font-bold mb-6 text-gray-800">Welcome 👋</h1>
 
             <form onSubmit={handleLogin} className="flex flex-col gap-4">
-              {/* EMAIL INPUT */}
+              {/* Email */}
               <input
                 type="email"
                 placeholder="Enter your Email"
@@ -139,7 +121,7 @@ function LoginForm() {
                 </p>
               )}
 
-              
+              {/* Password */}
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -154,13 +136,14 @@ function LoginForm() {
                     passwordError ? "border-red-500" : "border-gray-300"
                   }`}
                 />
-                
+
                 <button
                   type="button"
                   onClick={() => setShowPassword((prev) => !prev)}
                   className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-blue-600"
                 >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  {/* Eye open = password visible, Eye slashed = hidden */}
+                  {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
                 </button>
               </div>
               {passwordError && (
@@ -169,6 +152,7 @@ function LoginForm() {
                 </p>
               )}
 
+              {/* Submit Button */}
               <button
                 type="submit"
                 className="bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold transition-all"

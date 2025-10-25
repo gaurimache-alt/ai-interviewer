@@ -9,18 +9,18 @@ export default function RecordingButton() {
     addAnswer,
     currentQuestionIndex,
     nextQuestion,
-    setRecordingState, // we won't actually use context's setRecordingState here but keep if needed
+    setRecordingState, // kept in case needed
   } = useContext(InterviewContext);
 
-  // onResult callback to pass to the hook
+  // Callback to handle result from speech recognition
   const onResult = useCallback(
     (text) => {
-      // add to answers for current question and move to next
       addAnswer(text, currentQuestionIndex);
-      // small delay to show completed state then go next
+
+      // Small delay to show completed state before moving next
       setTimeout(() => {
         nextQuestion();
-      }, 700);
+      }, 800);
     },
     [addAnswer, currentQuestionIndex, nextQuestion]
   );
@@ -32,39 +32,36 @@ export default function RecordingButton() {
       alert("Speech recognition not supported in this browser. Use Chrome.");
       return;
     }
+
     if (state === "idle") start();
     else if (state === "recording") stop();
-    else if (state === "completed") {
-      // reset or let user re-record - just set to idle in hook (not exposed)
-      // we'll allow them to record again by calling start()
-      start();
-    }
+    else if (state === "completed") start(); // allow re-record
   };
 
-  const label =
-    state === "idle"
-      ? "🎤 Tap to Record"
-      : state === "recording"
-      ? "⏺ Recording..."
-      : state === "processing"
-      ? "⏳ Processing..."
-      : "✅ Completed";
+  // Dynamic label based on state
+  const label = {
+    idle: "🎤 Tap to Record",
+    recording: "⏺ Recording...",
+    processing: "⏳ Processing...",
+    completed: "✅ Completed",
+  }[state];
 
-  const className =
-    state === "recording"
-      ? `${styles.button} ${styles.recording}`
-      : state === "processing"
-      ? `${styles.button} ${styles.processing}`
-      : state === "completed"
-      ? `${styles.button} ${styles.completed}`
-      : `${styles.button} ${styles.idle}`;
+  // Dynamic className based on state
+  const className = {
+    idle: `${styles.button} ${styles.idle}`,
+    recording: `${styles.button} ${styles.recording}`,
+    processing: `${styles.button} ${styles.processing}`,
+    completed: `${styles.button} ${styles.completed}`,
+  }[state];
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center w-full max-w-xs mx-auto mt-6">
       <button onClick={handleClick} className={className}>
         {label}
       </button>
-      <p className="text-sm text-gray-500 mt-2">Tip: Click while speaking to stop early.</p>
+      <p className="text-sm text-gray-500 mt-2 text-center">
+        Tip: Click while speaking to stop early.
+      </p>
     </div>
   );
 }
