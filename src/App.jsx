@@ -75,7 +75,7 @@ function App() {
       <Routes>
         
         <Route path="/login" element={<LoginForm />} />
-        
+        <Route path="/signup" element={<SignupForm/>}/>
         <Route path="/about" element={<AboutUs />} />
         <Route path="/completed" element={<CompletionScreen />} />
 
