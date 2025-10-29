@@ -1,26 +1,57 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useState, useEffect } from "react";
 
 export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null); 
+  const [user, setUser] = useState(null);
   const [credits, setCredits] = useState(15);
-  console.log("AuthContext — credits (context):", credits);
+  const [loading, setLoading] = useState(true); 
 
-  const login = (name) => {
-    setUser({ name });
+  
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    const storedCredits = localStorage.getItem("credits");
+
+    if (storedUser) setUser(JSON.parse(storedUser));
+    if (storedCredits) setCredits(Number(storedCredits));
+
+    setLoading(false); 
+  }, []);
+
+  
+  useEffect(() => {
+    if (user) localStorage.setItem("user", JSON.stringify(user));
+    else localStorage.removeItem("user");
+  }, [user]);
+
+  
+  useEffect(() => {
+    localStorage.setItem("credits", credits);
+  }, [credits]);
+
+  
+  const login = (userData) => {
+    
+    setUser(userData);
+    localStorage.setItem("user", JSON.stringify(userData));
   };
 
-  const addCredits = (amount) => {
-    setCredits((prev) => prev + amount);
+  
+  const logout = () => {
+    setUser(null);
+    localStorage.clear();
   };
 
-  const deductCredits = (amount) => {
-    setCredits((prev) => Math.max(prev - amount, 0));
-  };
+  const addCredits = (amount) => setCredits((prev) => prev + amount);
+  const deductCredits = (amount) => setCredits((prev) => Math.max(prev - amount, 0));
+
+  
+  if (loading) return null;
 
   return (
-    <AuthContext.Provider value={{ user, credits, login, addCredits, deductCredits }}>
+    <AuthContext.Provider
+      value={{ user, credits, login, logout, addCredits, deductCredits }}
+    >
       {children}
     </AuthContext.Provider>
   );

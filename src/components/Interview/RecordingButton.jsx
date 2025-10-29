@@ -12,12 +12,12 @@ export default function RecordingButton() {
     setRecordingState, // kept in case needed
   } = useContext(InterviewContext);
 
-  // Callback to handle result from speech recognition
+  
   const onResult = useCallback(
     (text) => {
       addAnswer(text, currentQuestionIndex);
 
-      // Small delay to show completed state before moving next
+      
       setTimeout(() => {
         nextQuestion();
       }, 800);
@@ -64,4 +64,4 @@ export default function RecordingButton() {
       </p>
     </div>
   );
-}
+} 

@@ -1,4 +1,3 @@
-// src/components/Auth/LoginForm.jsx
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useContext } from "react";
@@ -14,14 +13,14 @@ function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const [fetchError,setFetchError] = useState("");
+  const [fetchError, setFetchError] = useState("");
 
-  const handleLogin =async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
+    // ✅ Validation
     const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
     const passwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[{\]};:'",.<>/?\\|`~]).{8,}$/;
@@ -31,43 +30,50 @@ function LoginForm() {
     if (!gmailRegex.test(email)) {
       setEmailError("Invalid email address (must be @gmail.com)");
       isValid = false;
-    } else {
-      setEmailError("");
-    }
+    } else setEmailError("");
 
     if (!passwordRegex.test(password)) {
       setPasswordError(
         "Password must be at least 8 characters long, include 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special symbol."
       );
       isValid = false;
-    } else {
-      setPasswordError("");
-    }
+    } else setPasswordError("");
 
     if (!isValid) return;
 
-    login(email);
-    console.log("LoginForm: login() called with", email);
+    try {
+      
+      const result = await fetchFunction({
+        apiUrl: LOGIN_URL,
+        crudMethod: "POST",
+        postData: { email, password },
+        setError: setFetchError,
+      });
 
-    const postData = {
-      email,password
+      
+      if (result?.status === "success") {
+        const token = result?.accessToken;
+        const userData = {
+          email,
+          token,
+          name: result?.data?.name || "User",
+        };
+
+        
+        login(userData);
+
+        
+        localStorage.setItem("aiInterviewerAccessToken", token);
+
+        
+        navigate("/dashboard");
+      } else {
+        setFetchError(result?.message || "Login failed. Try again.");
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      setFetchError("Something went wrong while logging in.");
     }
-
-    const result = await fetchFunction({
-      apiUrl : LOGIN_URL,
-      crudMethod : "POST",
-      postData,
-      setError : setFetchError
-    })
-
-    if(result?.status === "success"){
-      sessionStorage.setItem("aiInterviewerAccessToken",result?.accessToken)
-      navigate("/dashboard");
-    }else{
-      console.log("error in fetch : ", fetchError)
-    }
-
-
   };
 
   return (
@@ -80,19 +86,19 @@ function LoginForm() {
         </h1>
         <nav className="flex space-x-6 text-lg font-semibold">
           <button
-            onClick={() => (window.location.href = "/about")}
+            onClick={() => navigate("/about")}
             className="text-white hover:text-blue-400 transition"
           >
             About Us
           </button>
           <button
-            onClick={() => (window.location.href = "/login")}
+            onClick={() => navigate("/login")}
             className="text-white hover:text-blue-400 transition"
           >
             Login
           </button>
           <button
-            onClick={() => (window.location.href = "/signup")}
+            onClick={() => navigate("/signup")}
             className="text-white hover:text-blue-400 transition"
           >
             Signup
@@ -164,13 +170,18 @@ function LoginForm() {
                   onClick={() => setShowPassword((prev) => !prev)}
                   className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-blue-600"
                 >
-                  {/* Eye open = password visible, Eye slashed = hidden */}
                   {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
                 </button>
               </div>
               {passwordError && (
                 <p className="text-red-500 text-sm font-medium -mt-2">
                   {passwordError}
+                </p>
+              )}
+
+              {fetchError && (
+                <p className="text-red-500 text-sm font-medium -mt-2">
+                  {fetchError}
                 </p>
               )}
 

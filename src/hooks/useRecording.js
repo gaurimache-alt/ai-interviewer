@@ -1,16 +1,18 @@
 import { useState, useRef, useEffect } from "react";
 
-export default function useRecording(onResult) {
-  const [state, setState] = useState("idle"); 
+export default function useRecording(onResult, onResetAfterComplete) {
+  const [state, setState] = useState("idle");
   const recognitionRef = useRef(null);
+  const timerRef = useRef(null);
 
   useEffect(() => {
     return () => {
       if (recognitionRef.current) {
         try {
-          recognitionRef.current.abort?.();
+          recognitionRef.current.abort();
         } catch {}
       }
+      clearTimeout(timerRef.current);
     };
   }, []);
 
@@ -24,27 +26,65 @@ export default function useRecording(onResult) {
     }
 
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const r = new SR();
-    r.lang = "en-US";
-    r.interimResults = false;
-    r.continuous = false;
+    const recognition = new SR();
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+    recognition.continuous = false;
 
-    r.onstart = () => setState("recording");
-    r.onresult = (e) => {
-      setState("processing");
+    recognition.onstart = () => {
+      console.log("🎙️ Started recording");
+      setState("recording");
+
+      
+      timerRef.current = setTimeout(() => {
+        console.log("⏰ Auto-stopping after 10s");
+        recognition.stop();
+      }, 10000);
+    };
+
+    recognition.onresult = (e) => {
+      clearTimeout(timerRef.current);
+      console.log("✅ Speech recognized");
       const text = e.results[0][0].transcript;
+
+      setState("processing");
       setTimeout(() => {
         setState("completed");
         onResult?.(text);
+
+        
+        setTimeout(() => {
+          console.log("🔁 Resetting to idle for next question");
+          setState("idle");
+          onResetAfterComplete?.(); 
+        }, 1500);
       }, 500);
     };
-    r.onerror = () => setState("idle");
-    recognitionRef.current = r;
-    r.start();
+
+    recognition.onerror = (err) => {
+      console.error("❌ Speech recognition error:", err);
+      clearTimeout(timerRef.current);
+      setState("idle");
+    };
+
+    recognition.onend = () => {
+      console.log("🛑 Recording stopped (onend triggered)");
+      clearTimeout(timerRef.current);
+      setState((prev) => (prev === "recording" ? "completed" : prev));
+    };
+
+    recognitionRef.current = recognition;
+    recognition.start();
   };
 
   const stop = () => {
-    recognitionRef.current?.stop();
+    if (recognitionRef.current) {
+      console.log("🧭 Manual stop clicked");
+      setState("processing"); 
+      recognitionRef.current.stop();
+    } else {
+      console.log("⚠️ No active recognition instance");
+    }
   };
 
   return { state, start, stop, supportsRecognition };

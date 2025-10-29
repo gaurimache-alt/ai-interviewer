@@ -159,4 +159,3 @@ import fetchFunction from "../../utils/fetchFunction";
     </div>
   );
 }
-

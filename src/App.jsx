@@ -30,8 +30,8 @@ export default function AppWrapper() {
 
 function App() {
   
-  const { user, credits, deductCredits } = useContext(AuthContext);
-
+  const { user, credits, deductCredits,loading } = useContext(AuthContext);
+  if (loading) return <div>Loading...</div>;
   
   const interviewCtx = useContext(InterviewContext) || {};
   const {
@@ -75,7 +75,7 @@ function App() {
       <Routes>
         
         <Route path="/login" element={<LoginForm />} />
-        <Route path="/signup" element={<SignupForm />} />
+        
         <Route path="/about" element={<AboutUs />} />
         <Route path="/completed" element={<CompletionScreen />} />
 
