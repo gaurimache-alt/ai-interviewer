@@ -4,6 +4,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState, useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { Eye, EyeOff } from "lucide-react";
+import fetchFunction from "../../utils/fetchFunction";
+import { LOGIN_URL } from "../../utils/constants";
 
 function LoginForm() {
   const navigate = useNavigate();
@@ -15,8 +17,9 @@ function LoginForm() {
 
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [fetchError,setFetchError] = useState("");
 
-  const handleLogin = (e) => {
+  const handleLogin =async (e) => {
     e.preventDefault();
 
     const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
@@ -45,7 +48,26 @@ function LoginForm() {
 
     login(email);
     console.log("LoginForm: login() called with", email);
-    navigate("/dashboard");
+
+    const postData = {
+      email,password
+    }
+
+    const result = await fetchFunction({
+      apiUrl : LOGIN_URL,
+      crudMethod : "POST",
+      postData,
+      setError : setFetchError
+    })
+
+    if(result?.status === "success"){
+      sessionStorage.setItem("aiInterviewerAccessToken",result?.accessToken)
+      navigate("/dashboard");
+    }else{
+      console.log("error in fetch : ", fetchError)
+    }
+
+
   };
 
   return (

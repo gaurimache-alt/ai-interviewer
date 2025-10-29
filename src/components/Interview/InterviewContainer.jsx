@@ -12,7 +12,7 @@ import styles from "../../styles/InterviewContainer.module.css";
 
 export default function InterviewContainer() {
   const {
-    QUESTIONS,
+    questionSet,
     currentQuestionIndex,
     playQuestion,
     selectedCompany,
@@ -82,7 +82,7 @@ export default function InterviewContainer() {
 
           {/* Progress */}
           <ProgressionIndicator
-            total={QUESTIONS.length}
+            total={questionSet.length}
             current={currentQuestionIndex + 1}
           />
 

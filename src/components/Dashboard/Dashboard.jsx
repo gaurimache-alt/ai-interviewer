@@ -1,14 +1,16 @@
 // src/components/Dashboard/Dashboard.jsx
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bot } from "lucide-react";
-
+import { ALL_COMPANIES_URL } from "../../utils/constants";
+import fetchFunction from "../../utils/fetchFunction";
 
  export default function Dashboard({ credits = 0, onSelect = () => {} }) {
   const navigate = useNavigate();
   const [showCredits, setShowCredits] = useState(false);
-
+  const [fetchError,setFetchError] = useState("");
+  const [companiesInfo,setCompaniesInfo] = useState(null);
   const companies = [
     { name: "TCS", role: "Frontend Developer" },
     { name: "Infosys", role: "Backend Developer" },
@@ -22,9 +24,28 @@ import { Bot } from "lucide-react";
     { name: "Equifax", role: "DevOps Engineer" },
   ];
 
+
+
+  useEffect(()=>{
+    initialCompaniesFetch();
+  },[])
+
+  async function initialCompaniesFetch(){
+    const result = await fetchFunction({
+      apiUrl : ALL_COMPANIES_URL,
+      crudMethod : "GET",
+      setError : setFetchError
+    })
+    if(result.status === "success"){
+      setCompaniesInfo(result?.companyData);
+    }else{
+      console.log("ERROR IN FETCH : ",fetchError);
+    }
+  }
+
   // Delegate to App.jsx to handle credit check, deduct and navigation
   const handleStart = (company) => {
-    onSelect(company.name, company.role);
+    onSelect(company.slug,company.companyName,company.role);
   };
 
   const handleLogout = () => {
@@ -70,14 +91,14 @@ import { Bot } from "lucide-react";
 
       {/* Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
-        {companies.map((company, index) => (
+        {(companiesInfo ? companiesInfo : companies).map((company, index) => (
           <motion.div
             key={index}
             whileHover={{ scale: 1.07 }}
             transition={{ type: "spring", stiffness: 200, damping: 12 }}
             className="bg-white text-gray-800 p-6 rounded-2xl shadow-lg w-72 cursor-pointer hover:shadow-2xl text-center flex flex-col items-center"
           >
-            <h2 className="text-2xl font-bold mb-2 text-indigo-700">{company.name}</h2>
+            <h2 className="text-2xl font-bold mb-2 text-indigo-700">{company.companyName}</h2>
             <p className="text-gray-600 mb-4">{company.role}</p>
             <button
               onClick={() => handleStart(company)}

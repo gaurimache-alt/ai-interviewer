@@ -3,6 +3,8 @@ import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import fetchFunction from "../../utils/fetchFunction";
+import { SIGNUP_URL } from "../../utils/constants";
 
 export default function SignupForm() {
   const navigate = useNavigate();
@@ -15,8 +17,9 @@ export default function SignupForm() {
   const [nameError, setNameError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [fetchError,setFetchError] = useState("");
 
-  const handleSignup = (e) => {
+  const handleSignup =async (e) => {
     e.preventDefault();
 
     let isValid = true;
@@ -43,7 +46,26 @@ export default function SignupForm() {
 
     if (!isValid) return;
 
-    navigate("/login");
+    const postData = {
+      name:fullName,
+      email,
+      password
+    }
+
+    const result = await fetchFunction({
+      apiUrl : SIGNUP_URL,
+      crudMethod : "POST",
+      postData,
+      setError : setFetchError
+    })
+
+    if(result?.status === "success"){
+      sessionStorage.setItem("aiInterviewerAccessToken",result?.accessToken)
+      navigate("/dashboard");
+    }else{
+      console.log("ERROR in FETCHING : ",fetchError)
+    }
+
   };
 
   return (
