@@ -38,7 +38,6 @@ export function InterviewProvider({ children }) {
     }
   };
    let questionSet = (dbQuestions && dbQuestions?.questionsSet?.questions) || QUESTIONS
-
   const playQuestion = (index = currentQuestionIndex) => {
     if (!("speechSynthesis" in window)) return;
     window.speechSynthesis.cancel();
@@ -51,7 +50,10 @@ export function InterviewProvider({ children }) {
   const addAnswer = (text, index = currentQuestionIndex) => {
     setAnswers((prev) => {
       const copy = [...prev];
-      copy[index] = text;
+      copy[index] = {
+        questionId : questionSet[index]?.questionId,  
+        answer : text || "No Answer Recorded"
+      };
       return copy;
     });
   };
@@ -73,6 +75,7 @@ export function InterviewProvider({ children }) {
   return (
     <InterviewContext.Provider
       value={{
+        dbQuestions,
         questionSet,
         started,
         startInterview,

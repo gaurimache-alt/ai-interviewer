@@ -19,6 +19,7 @@ import AboutUs from "./components/About/AboutUs";
 import InterviewContainer from "./components/Interview/InterviewContainer";
 import CompletionScreen from "./components/Interview/CompletionScreen";
 import BuyCreditsModal from "./components/Dashboard/BuyCreditsModal";
+import { ReviewPage } from "./components/Interview/ReviewPage";
 
 export default function AppWrapper() {
   return (
@@ -77,7 +78,7 @@ function App() {
         <Route path="/login" element={<LoginForm />} />
         <Route path="/signup" element={<SignupForm/>}/>
         <Route path="/about" element={<AboutUs />} />
-        <Route path="/completed" element={<CompletionScreen />} />
+
 
         {/* Protected Dashboard route: redirect to /login when not logged in */}
         <Route
@@ -106,6 +107,15 @@ function App() {
               <Navigate to="/login" replace />
             )
           }
+        />
+        
+        <Route 
+        path="/completed" 
+        element={user ? <CompletionScreen /> : <Navigate to="/login" replace/>} 
+        />
+        <Route 
+        path="/review" 
+        element={user ? <ReviewPage /> : <Navigate to="/login" replace/>} 
         />
 
         {/* Root and fallback */}

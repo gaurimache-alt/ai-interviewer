@@ -54,9 +54,7 @@ function LoginForm() {
       if (result?.status === "success") {
         const token = result?.accessToken;
         const userData = {
-          email,
-          token,
-          name: result?.data?.name || "User",
+          user : result?.userDetails
         };
 
         
