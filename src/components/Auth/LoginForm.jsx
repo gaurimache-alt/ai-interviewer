@@ -8,7 +8,7 @@ import { LOGIN_URL } from "../../utils/constants";
 
 function LoginForm() {
   const navigate = useNavigate();
-  const { login } = useContext(AuthContext);
+  const { login,setLoading } = useContext(AuthContext);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,7 +19,7 @@ function LoginForm() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
+    setLoading(true);
     // ✅ Validation
     const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
     const passwordRegex =
@@ -57,7 +57,7 @@ function LoginForm() {
           user : result?.userDetails
         };
 
-        
+        setLoading(false);
         login(userData);
 
         
@@ -67,10 +67,12 @@ function LoginForm() {
         navigate("/dashboard");
       } else {
         setFetchError(result?.message || "Login failed. Try again.");
+        setLoading(false);
       }
     } catch (err) {
       console.error("Login error:", err);
       setFetchError("Something went wrong while logging in.");
+      setLoading(false);
     }
   };
 

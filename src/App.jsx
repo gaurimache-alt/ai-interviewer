@@ -20,6 +20,7 @@ import InterviewContainer from "./components/Interview/InterviewContainer";
 import CompletionScreen from "./components/Interview/CompletionScreen";
 import BuyCreditsModal from "./components/Dashboard/BuyCreditsModal";
 import { ReviewPage } from "./components/Interview/ReviewPage";
+import Loader from "./components/Loader/Loader";
 
 export default function AppWrapper() {
   return (
@@ -32,8 +33,7 @@ export default function AppWrapper() {
 function App() {
   
   const { user, credits, deductCredits,loading } = useContext(AuthContext);
-  if (loading) return <div>Loading...</div>;
-  
+  const {loadding} = useContext(InterviewContext);
   const interviewCtx = useContext(InterviewContext) || {};
   const {
     started = false,
@@ -65,10 +65,12 @@ function App() {
 
   const closeModal = () => setShowCreditsModal(false);
 
+ 
+
   return (
     <>
       
-      
+      {(loading || loadding) && <Loader/>}
       {/* Buy Credits Modal */}
       {showCreditsModal && <BuyCreditsModal closeModal={closeModal} />}
 

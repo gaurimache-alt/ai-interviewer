@@ -1,10 +1,11 @@
 // src/components/Dashboard/Dashboard.jsx
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bot } from "lucide-react";
 import { ALL_COMPANIES_URL } from "../../utils/constants";
 import fetchFunction from "../../utils/fetchFunction";
+import { InterviewContext } from "../../context/InterviewContext";
 
  export default function Dashboard({ credits = 0, onSelect = () => {} }) {
   const navigate = useNavigate();
@@ -24,13 +25,14 @@ import fetchFunction from "../../utils/fetchFunction";
     { name: "Equifax", role: "DevOps Engineer" },
   ];
 
-
+  const {setLoadding} = useContext(InterviewContext);
 
   useEffect(()=>{
     initialCompaniesFetch();
   },[])
 
   async function initialCompaniesFetch(){
+    setLoadding(true);
     const result = await fetchFunction({
       apiUrl : ALL_COMPANIES_URL,
       crudMethod : "GET",
@@ -38,8 +40,10 @@ import fetchFunction from "../../utils/fetchFunction";
     })
     if(result.status === "success"){
       setCompaniesInfo(result?.companyData);
+      setLoadding(false);
     }else{
       console.log("ERROR IN FETCH : ",fetchError);
+      setLoadding(false);
     }
   }
 

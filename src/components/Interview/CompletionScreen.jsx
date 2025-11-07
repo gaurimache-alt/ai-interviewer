@@ -7,7 +7,7 @@ import fetchFunction from "../../utils/fetchFunction";
 import { Save_Answer } from "../../utils/constants";
 
 export default function CompletionScreen() {
-  const { answers,dbQuestions } = useContext(InterviewContext);
+  const { answers,dbQuestions,setLoadding } = useContext(InterviewContext);
   const {user} = useContext(AuthContext);
   const [error,setError] = useState("");
 
@@ -18,6 +18,7 @@ export default function CompletionScreen() {
   }
   console.log(postData)
   useEffect(()=>{
+    setLoadding(true);
     try {
       const result = fetchFunction({
         apiUrl : Save_Answer,
@@ -26,12 +27,15 @@ export default function CompletionScreen() {
         setError
       })
       if(result?.status === "success"){
+        setLoadding(false);
         console.log(result);
       }else{
         console.log("Error in Posting : ", error)
+        setLoadding(false);
       }
     } catch (err) {
       setError("Error Caused + ",err)
+      setLoadding(false);
     }
   },[])
 

@@ -6,6 +6,7 @@ import { QUESTIONS_BY_COMPANY } from "../utils/constants";
 export const InterviewContext = createContext();
 
 export function InterviewProvider({ children }) {
+  const [loadding,setLoadding] = useState(false);
   const [started, setStarted] = useState(false);
   const [completed, setCompleted] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -93,7 +94,9 @@ export function InterviewProvider({ children }) {
         selectedCompany,
         selectedRole,
         selectCompanyRole,
-        setStarted
+        setStarted,
+        loadding,
+        setLoadding
       }}
     >
       {children}

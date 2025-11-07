@@ -8,14 +8,14 @@ import { Link } from "react-router-dom";
 export function ReviewPage() {
   const [interviewDetails, setInterviewDetails] = useState(null);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
+
 
   const { user } = useContext(AuthContext);
-  const { dbQuestions } = useContext(InterviewContext);
+  const { dbQuestions,setLoadding } = useContext(InterviewContext);
 
   async function GetInterviewDetails() {
     try {
-      setLoading(true);
+      setLoadding(true);
       const result = await fetchFunction({
         apiUrl:
           GET_INTERVIEW_DETAILS +
@@ -31,10 +31,11 @@ export function ReviewPage() {
       } else {
         setError("Error in Fetch: " + result?.message);
       }
+      setLoadding(false)
     } catch (err) {
       setError("Error in Fetch: " + err);
     } finally {
-      setLoading(false);
+      setLoadding(false);
     }
   }
 
@@ -42,18 +43,6 @@ export function ReviewPage() {
     GetInterviewDetails();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-indigo-600 border-t-transparent mb-4"></div>
-          <p className="text-lg font-medium text-gray-700">
-            Fetching your interview details...
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-8 px-4 sm:px-6 lg:px-8">

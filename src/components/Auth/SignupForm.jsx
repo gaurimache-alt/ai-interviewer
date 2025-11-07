@@ -1,10 +1,11 @@
 // src/components/Auth/SignupForm.jsx
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import fetchFunction from "../../utils/fetchFunction";
 import { SIGNUP_URL } from "../../utils/constants";
+import { AuthContext } from "../../context/AuthContext";
 
 export default function SignupForm() {
   const navigate = useNavigate();
@@ -19,9 +20,11 @@ export default function SignupForm() {
   const [passwordError, setPasswordError] = useState("");
   const [fetchError,setFetchError] = useState("");
 
+  const {setLoading} = useContext(AuthContext);
+
   const handleSignup =async (e) => {
     e.preventDefault();
-
+    setLoading(true);
     let isValid = true;
 
     if (!fullName.trim()) {
@@ -61,9 +64,11 @@ export default function SignupForm() {
 
     if(result?.status === "success"){
       sessionStorage.setItem("aiInterviewerAccessToken",result?.accessToken)
+      setLoading(false);
       navigate("/dashboard");
     }else{
       console.log("ERROR in FETCHING : ",fetchError)
+      setLoading(false);
     }
 
   };
