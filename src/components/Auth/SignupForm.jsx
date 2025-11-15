@@ -32,9 +32,9 @@ export default function SignupForm() {
       isValid = false;
     } else setNameError("");
 
-    const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
-    if (!gmailRegex.test(email)) {
-      setEmailError("Invalid email address (must be @gmail.com)");
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setEmailError("Invalid email address");
       isValid = false;
     } else setEmailError("");
 
@@ -61,9 +61,10 @@ export default function SignupForm() {
       postData,
       setError : setFetchError
     })
+    console.log("SIGNUP RESULT ", result);
 
     if(result?.status === "success"){
-      sessionStorage.setItem("aiInterviewerAccessToken",result?.accessToken)
+      localStorage.setItem("aiInterviewerAccessToken",result?.accessToken)
       setLoading(false);
       navigate("/dashboard");
     }else{

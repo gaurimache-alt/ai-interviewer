@@ -1,3 +1,4 @@
+// src/context/InterviewContext.jsx
 import React, { createContext, useState, useRef } from "react";
 import { questions as QUESTIONS } from "../utils/questions";
 import fetchFunction from "../utils/fetchFunction";
@@ -6,72 +7,123 @@ import { QUESTIONS_BY_COMPANY } from "../utils/constants";
 export const InterviewContext = createContext();
 
 export function InterviewProvider({ children }) {
-  const [loadding,setLoadding] = useState(false);
+  // Loading and interview state
+  const [loading, setLoading] = useState(false);
   const [started, setStarted] = useState(false);
   const [completed, setCompleted] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [answers, setAnswers] = useState(Array(QUESTIONS.length).fill(""));
 
+  // Autoplay state
+  const [shouldAutoPlay, setShouldAutoPlay] = useState(true);
+
+  // Manual replay trigger
+  const triggerReplay = () => setShouldAutoPlay(true);
+
+  // Answers
+  const [answers, setAnswers] = useState(
+    Array(QUESTIONS.length).fill({ questionId: "", answer: "" })
+  );
+
+  // Recording + DB questions
   const [recordingState, setRecordingState] = useState("idle");
-  const [dbQuestions,setDbQuestions] = useState(null);
-  const [dbQuestionsError,setDbQuestionsError] = useState("");
+  const [dbQuestions, setDbQuestions] = useState(null);
+  const [dbQuestionsError, setDbQuestionsError] = useState("");
   const recognitionRef = useRef(null);
 
-  // For dashboard selection
+  // Dashboard selection
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [selectedRole, setSelectedRole] = useState(null);
 
-  const startInterview = () => setStarted(true);
+  // Actual questions
+  const questionSet =
+    (dbQuestions && dbQuestions?.questionsSet?.questions) || QUESTIONS;
 
-  const selectCompanyRole =async (slug,company, role) => {
+  // Reset interview state
+  const resetInterview = () => {
+    setStarted(false);
+    setCompleted(false);
+    setCurrentQuestionIndex(0);
+    setAnswers(Array(questionSet.length).fill({ questionId: "", answer: "" }));
+    setRecordingState("idle");
+    setShouldAutoPlay(true); // autoplay first question
+  };
+
+  // Start interview
+  const startInterview = () => {
+    resetInterview();
+    setStarted(true);
+  };
+
+  // Select company + role → fetch questions
+  const selectCompanyRole = async (slug, company, role) => {
     setSelectedCompany(company);
     setSelectedRole(role);
-    const result =await fetchFunction({
-      apiUrl : QUESTIONS_BY_COMPANY+slug,
-      crudMethod : "GET",
-      setError : setDbQuestionsError
-    })
 
-    if(result.status === "success"){
+    const result = await fetchFunction({
+      apiUrl: QUESTIONS_BY_COMPANY + slug,
+      crudMethod: "GET",
+      setError: setDbQuestionsError,
+    });
+
+    if (result.status === "success") {
       setDbQuestions(result);
-    }else{
-      console.log("ERROR IN FETCHING SLUG : ",dbQuestionsError);
+    } else {
+      console.log("ERROR FETCHING QUESTIONS:", dbQuestionsError);
     }
   };
-   let questionSet = (dbQuestions && dbQuestions?.questionsSet?.questions) || QUESTIONS
+
+  // Speak question
   const playQuestion = (index = currentQuestionIndex) => {
     if (!("speechSynthesis" in window)) return;
     window.speechSynthesis.cancel();
+
     const text = questionSet[index]?.question || questionSet[index];
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = "en-US";
+
     window.speechSynthesis.speak(utterance);
   };
 
+  // Save answer
   const addAnswer = (text, index = currentQuestionIndex) => {
     setAnswers((prev) => {
       const copy = [...prev];
       copy[index] = {
-        questionId : questionSet[index]?.questionId,  
-        answer : text || "No Answer Recorded"
+        questionId: questionSet[index]?.questionId,
+        answer: text || "No Answer Recorded",
       };
       return copy;
     });
   };
 
+  // Next question
   const nextQuestion = () => {
     setRecordingState("idle");
+
+    // Move to next if available
     if (currentQuestionIndex < questionSet.length - 1) {
-      const next = currentQuestionIndex + 1;
-      setCurrentQuestionIndex(next);
-    } else setCompleted(true);
+      setCurrentQuestionIndex((prev) => prev + 1);
+
+      // Enable autoplay for both manual next and recording-finish next
+      setShouldAutoPlay(true);
+    } else {
+      // Last question - interview complete
+      setCompleted(true);
+
+      // DO NOT autoplay anything here
+      setShouldAutoPlay(false);
+    }
   };
 
+  // Previous question
   const prevQuestion = () => {
-    if (currentQuestionIndex > 0) setCurrentQuestionIndex((i) => i - 1);
-  };
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex((prev) => prev - 1);
 
- 
+      // No autoplay when going back
+      setShouldAutoPlay(false);
+    }
+  };
 
   return (
     <InterviewContext.Provider
@@ -80,6 +132,7 @@ export function InterviewProvider({ children }) {
         questionSet,
         started,
         startInterview,
+        resetInterview,
         completed,
         currentQuestionIndex,
         setCurrentQuestionIndex,
@@ -95,8 +148,13 @@ export function InterviewProvider({ children }) {
         selectedRole,
         selectCompanyRole,
         setStarted,
-        loadding,
-        setLoadding
+        loading,
+        setLoading,
+
+        // autoplay exports
+        shouldAutoPlay,
+        setShouldAutoPlay,
+        triggerReplay,
       }}
     >
       {children}

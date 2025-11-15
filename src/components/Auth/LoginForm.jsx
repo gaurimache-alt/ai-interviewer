@@ -20,15 +20,15 @@ function LoginForm() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
-    // ✅ Validation
-    const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+    // Validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const passwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[{\]};:'",.<>/?\\|`~]).{8,}$/;
 
     let isValid = true;
 
-    if (!gmailRegex.test(email)) {
-      setEmailError("Invalid email address (must be @gmail.com)");
+    if (!emailRegex.test(email)) {
+      setEmailError("Invalid email address");
       isValid = false;
     } else setEmailError("");
 
@@ -49,6 +49,7 @@ function LoginForm() {
         postData: { email, password },
         setError: setFetchError,
       });
+      console.log("LOGIN RESULT ", result);
 
       
       if (result?.status === "success") {

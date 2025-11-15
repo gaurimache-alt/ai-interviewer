@@ -21,12 +21,12 @@ import { useNavigate } from "react-router-dom";
           >
             Home
           </button>
-          <button
+          {/* <button
             onClick={() => (window.location.href = "/about")}
             className="text-white hover:text-blue-400 transition"
           >
             About Us
-          </button>
+          </button> */}
           <button
             onClick={() => (window.location.href = "/credits")}
             className="text-white hover:text-blue-400 transition"
@@ -88,12 +88,12 @@ import { useNavigate } from "react-router-dom";
             and accessible to everyone.
           </p>
 
-          <button
+          {/* <button
             onClick={() => navigate("/dashboard")}
             className="bg-indigo-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-indigo-700 transition-all"
           >
             ← Back to Dashboard
-          </button>
+          </button> */}
         </motion.div>
       </div>
     </>

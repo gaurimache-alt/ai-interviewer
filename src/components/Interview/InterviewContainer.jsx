@@ -1,8 +1,8 @@
-// src/components/Interview/InterviewContainer.jsx
 import React, { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { InterviewContext } from "../../context/InterviewContext";
+import useAuth from "../../hooks/useAuth";
 import QuestionDisplay from "./QuestionDisplay";
 import AnswerDisplay from "./AnswerDisplay";
 import RecordingButton from "./RecordingButton";
@@ -17,15 +17,26 @@ export default function InterviewContainer() {
     playQuestion,
     selectedCompany,
     selectedRole,
-    credits,
+    startInterview,
+    resetInterview,
+
+    // NEW autoplay control variables from context
+    shouldAutoPlay,
+    setShouldAutoPlay,
+    triggerReplay,
   } = useContext(InterviewContext);
 
+  const { credits } = useAuth();
   const navigate = useNavigate();
   const [showCredits, setShowCredits] = useState(false);
 
+  // FIXED: Autoplay only when shouldAutoPlay = true
   useEffect(() => {
-    playQuestion(currentQuestionIndex);
-  }, [currentQuestionIndex, playQuestion]);
+    if (shouldAutoPlay) {
+      playQuestion(currentQuestionIndex);
+      setShouldAutoPlay(false); // prevent re-playing next time index changes
+    }
+  }, [currentQuestionIndex, shouldAutoPlay]);
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#a7c0f2] via-[#7ea1e8] to-[#a7c0f2]">
@@ -35,31 +46,21 @@ export default function InterviewContainer() {
           <span className="text-white mr-2">🤖</span>
           AI <span className="text-blue-300 ml-1">Interviewer</span>
         </h1>
-        
 
         <nav className="flex space-x-4 text-lg font-medium overflow-x-auto">
-          <Link
-            to="/dashboard"
-            className="text-white hover:text-blue-400 transition whitespace-nowrap"
-          >
+          <Link to="/dashboard" className="text-white hover:text-blue-400 transition whitespace-nowrap">
             Home
           </Link>
-          <Link
-            to="/about"
-            className="text-white hover:text-blue-400 transition whitespace-nowrap"
-          >
+          {/* <Link to="/about" className="text-white hover:text-blue-400 transition whitespace-nowrap">
             About Us
-          </Link>
+          </Link> */}
           <button
             onClick={() => setShowCredits(true)}
             className="text-white hover:text-blue-400 transition whitespace-nowrap"
           >
             Credits
           </button>
-          <Link
-            to="/logout"
-            className="text-white hover:text-red-400 transition whitespace-nowrap"
-          >
+          <Link to="/logout" className="text-white hover:text-red-400 transition whitespace-nowrap">
             Logout
           </Link>
         </nav>
@@ -92,17 +93,17 @@ export default function InterviewContainer() {
           {/* Replay button */}
           <div className="flex justify-end my-2">
             <button
-              onClick={() => playQuestion(currentQuestionIndex)}
+              onClick={() => triggerReplay()} // NEW replay logic
               className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
             >
               🔊 Replay
             </button>
           </div>
 
-          {/* Answer */}
+          {/* Answer input controlled via context */}
           <AnswerDisplay />
 
-          {/* Recording */}
+          {/* Recording button */}
           <RecordingButton />
 
           {/* Navigation controls */}
@@ -125,9 +126,7 @@ export default function InterviewContainer() {
               exit={{ y: 50 }}
               className="bg-white text-gray-800 p-8 rounded-2xl shadow-2xl w-96 text-center"
             >
-              <h2 className="text-2xl font-bold mb-4 text-indigo-700">
-                Your Credits
-              </h2>
+              <h2 className="text-2xl font-bold mb-4 text-indigo-700">Your Credits</h2>
               <p className="text-5xl font-extrabold text-indigo-600 mb-4">{credits}</p>
               <p className="text-gray-600 mb-6">
                 Each interview costs <span className="font-semibold">5 credits</span>.

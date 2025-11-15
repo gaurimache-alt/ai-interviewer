@@ -32,19 +32,19 @@ export default function useRecording(onResult, onResetAfterComplete) {
     recognition.continuous = false;
 
     recognition.onstart = () => {
-      console.log("🎙️ Started recording");
+      console.log(" Started recording");
       setState("recording");
 
       
       timerRef.current = setTimeout(() => {
-        console.log("⏰ Auto-stopping after 10s");
+        console.log(" Auto-stopping after 10s");
         recognition.stop();
       }, 10000);
     };
 
     recognition.onresult = (e) => {
       clearTimeout(timerRef.current);
-      console.log("✅ Speech recognized");
+      console.log(" Speech recognized");
       const text = e.results[0][0].transcript;
 
       setState("processing");
@@ -54,7 +54,7 @@ export default function useRecording(onResult, onResetAfterComplete) {
 
         
         setTimeout(() => {
-          console.log("🔁 Resetting to idle for next question");
+          console.log(" Resetting to idle for next question");
           setState("idle");
           onResetAfterComplete?.(); 
         }, 1500);
@@ -62,13 +62,13 @@ export default function useRecording(onResult, onResetAfterComplete) {
     };
 
     recognition.onerror = (err) => {
-      console.error("❌ Speech recognition error:", err);
+      console.error(" Speech recognition error:", err);
       clearTimeout(timerRef.current);
       setState("idle");
     };
 
     recognition.onend = () => {
-      console.log("🛑 Recording stopped (onend triggered)");
+      console.log(" Recording stopped (onend triggered)");
       clearTimeout(timerRef.current);
       setState((prev) => (prev === "recording" ? "completed" : prev));
     };
@@ -79,11 +79,11 @@ export default function useRecording(onResult, onResetAfterComplete) {
 
   const stop = () => {
     if (recognitionRef.current) {
-      console.log("🧭 Manual stop clicked");
+      console.log(" Manual stop clicked");
       setState("processing"); 
       recognitionRef.current.stop();
     } else {
-      console.log("⚠️ No active recognition instance");
+      console.log(" No active recognition instance");
     }
   };
 

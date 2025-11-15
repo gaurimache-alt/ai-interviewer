@@ -5,7 +5,13 @@ import styles from "../../styles/AnswerBox.module.css";
 
 export default function AnswerDisplay() {
   const { answers, currentQuestionIndex } = useContext(InterviewContext);
-  const text = answers[currentQuestionIndex].answer || "";
+  const currAnswer = answers[currentQuestionIndex];
+
+  // Safe rendering: handle string, object, or undefined
+  const text =
+    typeof currAnswer === "string"
+      ? currAnswer
+      : currAnswer?.answer || "";
 
   return (
     <div role="status" aria-live="polite" className={styles.box}>

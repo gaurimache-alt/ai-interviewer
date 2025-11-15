@@ -18,7 +18,6 @@ import Dashboard from "./components/Dashboard/Dashboard";
 import AboutUs from "./components/About/AboutUs";
 import InterviewContainer from "./components/Interview/InterviewContainer";
 import CompletionScreen from "./components/Interview/CompletionScreen";
-import BuyCreditsModal from "./components/Dashboard/BuyCreditsModal";
 import { ReviewPage } from "./components/Interview/ReviewPage";
 import Loader from "./components/Loader/Loader";
 
@@ -46,7 +45,7 @@ function App() {
   const [showCreditsModal, setShowCreditsModal] = useState(false);
   const navigate = useNavigate();
 
-  const handleSelectRole = (company, role) => {
+  const handleSelectRole = (slug,companyName, role) => {
     if (credits <= 0) {
       setShowCreditsModal(true);
       return;
@@ -58,7 +57,7 @@ function App() {
     }
 
     deductCredits(5);
-    selectCompanyRole(company, role);
+    selectCompanyRole(slug, role);
     setStarted(true);
     navigate("/interview");
   };
